@@ -1,6 +1,19 @@
-const Restaurant = require('./models/Restaurant');
+const express = require('express');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const Restaurant = require('./models/Restaurant'); 
 
-// Create a new restaurant
+dotenv.config(); 
+
+const app = express(); 
+const PORT = process.env.PORT || 5000;
+
+app.use(express.json());
+
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('Connected to MongoDB'))
+    .catch((err) => console.error('Failed to connect to MongoDB:', err));
+
 app.post('/restaurants', async (req, res) => {
     try {
         const restaurant = new Restaurant(req.body);
@@ -11,7 +24,6 @@ app.post('/restaurants', async (req, res) => {
     }
 });
 
-// Get all restaurants
 app.get('/restaurants', async (req, res) => {
     try {
         const restaurants = await Restaurant.find();
@@ -21,7 +33,6 @@ app.get('/restaurants', async (req, res) => {
     }
 });
 
-// Get a specific restaurant by ID
 app.get('/restaurants/:id', async (req, res) => {
     try {
         const restaurant = await Restaurant.findById(req.params.id);
@@ -34,7 +45,6 @@ app.get('/restaurants/:id', async (req, res) => {
     }
 });
 
-// Update a restaurant by ID
 app.put('/restaurants/:id', async (req, res) => {
     try {
         const restaurant = await Restaurant.findByIdAndUpdate(req.params.id, req.body, {
@@ -50,7 +60,6 @@ app.put('/restaurants/:id', async (req, res) => {
     }
 });
 
-// Delete a restaurant by ID
 app.delete('/restaurants/:id', async (req, res) => {
     try {
         const restaurant = await Restaurant.findByIdAndDelete(req.params.id);
@@ -61,4 +70,8 @@ app.delete('/restaurants/:id', async (req, res) => {
     } catch (err) {
         res.status(500).send({ error: 'Something went wrong' });
     }
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
